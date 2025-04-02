@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;    // add this
 using Bookstore.Models;
+using Bookstore.Models.DataLayer.Configuration;
 
 namespace Bookstore
 {
@@ -49,6 +50,12 @@ namespace Bookstore
 
             app.UseAuthentication();   // add this
             app.UseAuthorization();    // add this
+
+            var scopeFactory = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>();
+            using (var scope = scopeFactory.CreateScope())
+            {
+                ConfigureIdentity.CreateAdminUserAsync(scope.ServiceProvider).GetAwaiter().GetResult();
+            }
 
             app.UseSession();
 
