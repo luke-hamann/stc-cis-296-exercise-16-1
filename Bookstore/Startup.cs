@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;    // add this
 using Bookstore.Models;
+using Bookstore.Models.DataLayer.Configuration;
 
 namespace Bookstore
 {
@@ -39,7 +40,7 @@ namespace Bookstore
         }
 
         // Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app)
+        public async void Configure(IApplicationBuilder app)
         {
             app.UseDeveloperExceptionPage();
             app.UseHttpsRedirection();
@@ -49,6 +50,12 @@ namespace Bookstore
 
             app.UseAuthentication();   // add this
             app.UseAuthorization();    // add this
+
+            var scopeFactory = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>();
+            using (var scope = scopeFactory.CreateScope())
+            {
+                await ConfigureIdentity.CreateAdminUserAsync(scope.ServiceProvider);
+            }
 
             app.UseSession();
 
